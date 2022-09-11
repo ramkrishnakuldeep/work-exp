@@ -1,14 +1,27 @@
 form.experience-form {
   margin: 2rem;
 
-  label {
+  .my-5 > label {
     min-width: 150px;
     height: 38px;
     line-height: 38px;
   }
 
+  .personal-details {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    > .profile-image {
+      width: auto;
+      
+      &+div {
+        width: 75%;
+      }
+    }
+  }
+
   .work-exp {
-    height: 630px;
+    height: 600px;
     overflow-y: scroll;
     -ms-overflow-style: none; /* for Internet Explorer, Edge */
     scrollbar-width: none; /* for Firefox */
@@ -56,6 +69,11 @@ form.experience-form {
 
     input+label{
       margin-left: 20px;
+    }
+
+    textarea {
+      width: 70%;
+      height: 100%;
     }
 
     .remove-work {
