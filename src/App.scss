@@ -1,0 +1,92 @@
+form.experience-form {
+  margin: 2rem;
+
+  label {
+    min-width: 150px;
+    height: 38px;
+    line-height: 38px;
+  }
+
+  .work-exp {
+    height: 630px;
+    overflow-y: scroll;
+    -ms-overflow-style: none; /* for Internet Explorer, Edge */
+    scrollbar-width: none; /* for Firefox */
+    &::-webkit-scrollbar {
+    display: none; /* for Chrome, Safari, and Opera */
+  }
+}
+
+  .my-5 {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .add-work {
+      display: flex;
+      justify-content:space-between;
+      button {
+        margin: 0;
+      }
+  }
+
+  .action {
+    display: flex;
+    justify-content: space-evenly;
+    position: fixed;
+    bottom: 20px;
+    width: calc(100% - 64px);
+    button {
+      width: 50%;
+      background-color: #3134ec;
+      opacity: 90%;
+    }
+    button + button {
+      margin-left: 20px;
+    }
+  }
+
+  .work-exp-detail {
+    border: 1px solid;
+    padding: 0 20px;
+
+    &.work-exp-detail {
+      margin-bottom: 20px;
+    }
+
+    input+label{
+      margin-left: 20px;
+    }
+
+    .remove-work {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  }
+
+  .my-5{
+    margin-bottom: 1.5rem;
+  }
+
+  @keyframes errorMessage {
+    from {margin-top: -50px;}
+    to {margin-top: -25px;}
+  }
+  
+
+  .formFieldError {
+    border: 1px solid #e11d48;
+  }
+  .formFieldErrorMessage {
+    color: #e11d48;
+    position: absolute;
+    margin-left: 150px;
+    margin-top: -25px;
+    animation-name: errorMessage;
+    animation-duration: .5s;
+    z-index: -2;
+    font-size: .80rem;
+  }
+
+  
+}
