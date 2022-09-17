@@ -1,5 +1,58 @@
+header.title, footer.title {
+  margin: auto;
+  width: 100%;
+  background-color: #5a67d8;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  position: fixed;
+  z-index: 9;
+  top: 0;
+}
+
+footer.action {
+  margin: auto;
+  width: 100%;
+  background-color: #8691f5;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  position: fixed;
+  z-index: 9;
+  bottom: 0;
+
+  display: flex;
+    justify-content: center;
+    position: fixed;
+    button {
+      width: 10%;
+      opacity: 90%;
+    }
+    button + button {
+      margin-left: 20px;
+    }
+}
+
 form.experience-form {
-  margin: 2rem;
+  margin: 4rem 2rem;
+  height: calc(100vh - 128px);
+  overflow-y: scroll;
+  -ms-overflow-style: none; /* for Internet Explorer, Edge */
+  scrollbar-width: none; /* for Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* for Chrome, Safari, and Opera */
+  }
+
+  .date-field, .job-field {
+    display: flex;
+    justify-content: space-between;
+
+    .my-5 {
+      width: 49%;
+    }
+  }
 
   .my-5 > label {
     min-width: 150px;
@@ -20,16 +73,6 @@ form.experience-form {
     }
   }
 
-  .work-exp {
-    height: 600px;
-    overflow-y: scroll;
-    -ms-overflow-style: none; /* for Internet Explorer, Edge */
-    scrollbar-width: none; /* for Firefox */
-    &::-webkit-scrollbar {
-    display: none; /* for Chrome, Safari, and Opera */
-  }
-}
-
   .my-5 {
     display: flex;
     justify-content: space-around;
@@ -41,22 +84,6 @@ form.experience-form {
       button {
         margin: 0;
       }
-  }
-
-  .action {
-    display: flex;
-    justify-content: space-evenly;
-    position: fixed;
-    bottom: 20px;
-    width: calc(100% - 64px);
-    button {
-      width: 50%;
-      background-color: #3134ec;
-      opacity: 90%;
-    }
-    button + button {
-      margin-left: 20px;
-    }
   }
 
   .work-exp-detail {
@@ -87,8 +114,8 @@ form.experience-form {
   }
 
   @keyframes errorMessage {
-    from {margin-top: -50px;}
-    to {margin-top: -25px;}
+    from {margin-top: 10px;}
+    to {margin-top: 40px;}
   }
   
 
@@ -98,8 +125,8 @@ form.experience-form {
   .formFieldErrorMessage {
     color: #e11d48;
     position: absolute;
-    margin-left: 150px;
-    margin-top: -25px;
+    margin-left: 55px;
+    margin-top: 40px;
     animation-name: errorMessage;
     animation-duration: .5s;
     z-index: -2;

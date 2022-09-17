@@ -16,11 +16,12 @@ export const valueValidator = ({ key, value }) => {
   }
   return "";
 };
-export const endDateValidator = ({ key, value, startDate }) => {
-  if (!value) {
-    return `${key} is required`;
-  } else if (startDate > value) {
-    return `${key} must be greater than 'Start date'`;
+
+export const dateValidator = ({ endDate, startDate }) => {
+  if (startDate && endDate) {
+    if (endDate < startDate) {
+      return `End date must be greater than 'Start date'`;
+    }
   }
   return "";
 };
@@ -54,7 +55,7 @@ export const useWorkFormValidator = (form) => {
     },
   });
 
-  const validateForm = ({ form, field, errors, forceTouchErrors = false }) => {
+  const validateForm = ({ form, field, errors, forceTouchErrors = true }) => {
     let isValid = true;
 
     // Create a deep copy of the errors
@@ -70,26 +71,64 @@ export const useWorkFormValidator = (form) => {
     console.log("field ", field);
 
     if (nextErrors.startDate.dirty && (field ? field === "startDate" : true)) {
-      const message = valueValidator({
-        key: "Start date",
-        value: startDate,
+      const startDateMessage = dateValidator({
+        startDate: startDate,
+        endDate: endDate,
       });
-      nextErrors.startDate.error = !!message;
-      nextErrors.startDate.message = message;
-      if (!!message) isValid = false;
+
+      nextErrors.startDate.error = !!startDateMessage;
+      nextErrors.startDate.message = startDateMessage;
+      if (!!startDateMessage) isValid = false;
+      nextErrors.endDate.error = !!startDateMessage;
+      nextErrors.endDate.message = startDateMessage;
+      if (!!startDateMessage) isValid = false;
     }
 
     if (nextErrors.endDate.dirty && (field ? field === "endDate" : true)) {
-      console.log("endDate ", endDate);
-      console.log("startDate ", startDate);
-      const endDateMessage = endDateValidator({
-        key: "End date",
-        value: endDate,
+      const endDateMessage = dateValidator({
         startDate: startDate,
+        endDate: endDate,
       });
+
       nextErrors.endDate.error = !!endDateMessage;
       nextErrors.endDate.message = endDateMessage;
       if (!!endDateMessage) isValid = false;
+      nextErrors.startDate.error = !!endDateMessage;
+      nextErrors.startDate.message = endDateMessage;
+      if (!!endDateMessage) isValid = false;
+    }
+
+    if (nextErrors.jobTitle.dirty && (field ? field === "jobTitle" : true)) {
+      const message = valueValidator({
+        key: "Job title",
+        value: jobTitle,
+      });
+      nextErrors.jobTitle.error = !!message;
+      nextErrors.jobTitle.message = message;
+      if (!!message) isValid = false;
+    }
+
+    if (
+      nextErrors.jobDescription.dirty &&
+      (field ? field === "jobDescription" : true)
+    ) {
+      const message = valueValidator({
+        key: "Job description",
+        value: jobDescription,
+      });
+      nextErrors.jobDescription.error = !!message;
+      nextErrors.jobDescription.message = message;
+      if (!!message) isValid = false;
+    }
+
+    if (nextErrors.company.dirty && (field ? field === "company" : true)) {
+      const message = valueValidator({
+        key: "Company",
+        value: company,
+      });
+      nextErrors.company.error = !!message;
+      nextErrors.company.message = message;
+      if (!!message) isValid = false;
     }
 
     console.log("nextErrors", JSON.parse(JSON.stringify(nextErrors)));
