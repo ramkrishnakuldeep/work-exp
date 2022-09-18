@@ -19,6 +19,26 @@ export const personalInfoFields = [
   },
 ];
 
+export const formObj = {
+  name: "",
+  age: 0,
+  src: "",
+};
+export const logoObj = {
+  id: '',
+  filename: '',
+  image: '',
+};
+
+export const workExpObj = {
+  startDate: "",
+  endDate: "",
+  company: "",
+  src: "",
+  jobTitle: "",
+  jobDescription: "",
+};
+
 export const convertToBase64 = (file: any): Promise<any> => {
   return new Promise((resolve) => {
     const reader = new FileReader();

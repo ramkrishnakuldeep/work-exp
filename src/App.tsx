@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext, useMemo } from "react";
 import "./App.scss";
 import Work from "./components/Work";
 import uuid from "react-uuid";
@@ -7,7 +7,12 @@ import Image from "./components/Image";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Input from "./components/Input";
-import { CompanyIcon, CompanyIconUpdateParams, WorkExp } from "./utils/types";
+import {
+  CompanyIcon,
+  WorkExp,
+  FormContextInterface,
+  CandidateResponse,
+} from "./utils/types";
 import { useFormValidator } from "./hooks/useFormValidator";
 import {
   bucket,
@@ -17,31 +22,53 @@ import {
   ImageURL,
   personalInfoFields,
   subFolder,
+  workExpObj,
+  formObj,
+  logoObj,
 } from "./constants/constants";
 
-function App() {
-  const workExpObj = {
-    startDate: "",
-    endDate: "",
-    company: "",
-    src: "",
-    jobTitle: "",
-    jobDescription: "",
-  };
+import { Map } from "immutable";
 
-  const [workExp, setWorkExp] = useState([{ id: uuid(), ...workExpObj }]);
+export const FormContext = createContext<FormContextInterface>({
+  isDisable: true,
+  setButtonDisability: () => {},
+  companyLogos: undefined,
+  workExp: Map(),
+  setWorkExp: () => {},
+  setCompanyLogos: () => {},
+});
+
+function App() {
+  const ID = uuid();
+  const initWorkExpMap = { [ID]: { ...workExpObj, id: ID } };
+  const [workExp, setWorkExp] = useState<Map<string, WorkExp>>(
+    Map(Object.entries(initWorkExpMap))
+  );
   const [isDisable, setButtonDisability] = useState(true);
   const [profileImage, setProfileImage] = useState<string>();
-  const [companyIcons, setCompanyIcons] = useState<CompanyIcon[]>([]);
-  const [form, setForm] = useState({ name: "", age: "", src: "" });
+  const [profile, setProfile] = useState<string>();
+  const [companyLogos, setCompanyLogos] = useState<Map<string, CompanyIcon>>();
+  const [form, setForm] = useState(formObj);
+
+  const value = useMemo(
+    () => ({
+      workExp,
+      companyLogos,
+      setWorkExp,
+      setCompanyLogos,
+      isDisable,
+      setButtonDisability,
+    }),
+    [workExp, companyLogos, isDisable]
+  );
 
   const { errors, validateForm, onBlurField } = useFormValidator(form);
 
   axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
   useEffect(() => {
     axios.get(DataURL).then((response: any) => {
-      const candidate = response.data[0];
-      setWorkExp(candidate.workExp);
+      const candidate: CandidateResponse = response.data[0];
+      setWorkExp(Map(candidate.workExp));
       setForm({
         name: candidate.name,
         age: candidate.age,
@@ -53,7 +80,7 @@ function App() {
 
   useEffect(() => {
     setButtonDisability(errors.age.error || errors.name.error);
-  }, [form]);
+  }, [errors, form]);
 
   const getImageFromS3 = (fileName: string) => {
     axios
@@ -67,8 +94,7 @@ function App() {
         reader.onloadend = function () {
           var base64data = reader.result;
           const base64 = base64data.split(";base64,")[1];
-          console.log(base64);
-          setProfileImage(base64);
+          setProfile(base64);
         };
       });
   };
@@ -87,36 +113,6 @@ function App() {
     setForm(nextFormState);
   };
 
-  const onWorkFormUpdate = async (params: WorkExp, isInvalid: boolean) => {
-    setButtonDisability(isInvalid);
-    const { company, jobDescription, jobTitle, startDate, endDate, id } =
-      params;
-    console.log("onWorkFormUpdate", {
-      company,
-      jobDescription,
-      jobTitle,
-      startDate,
-      endDate,
-      id,
-    });
-    const work: WorkExp[] = workExp.map((workExperience: WorkExp) => {
-      console.log("workExperience", workExperience);
-      if (workExperience.id === id) {
-        return {
-          ...workExperience,
-          company,
-          jobDescription,
-          jobTitle,
-          startDate,
-          endDate,
-        };
-      } else {
-        return workExperience;
-      }
-    });
-    setWorkExp(work);
-  };
-
   const onSubmit = async (e: any) => {
     e.preventDefault();
     console.log({ isDisable });
@@ -129,20 +125,18 @@ function App() {
       name: form.name,
       age: form.age,
       src: form.src,
-      workExp,
+      workExp: workExp,
     };
 
     const requestOne = axios.put(DataURL, requestData);
-    const requestTwo = axios.put(
-      `${ImageURL}${bucket}${subFolder}${form.src}`,
-      profileImage
-    );
+    const imageBucket = `${ImageURL}${bucket}${subFolder}`;
+    let requestTwo;
+    if (profileImage) {
+      requestTwo = axios.put(`${imageBucket}${form.src}`, profileImage);
+    }
 
-    const otherRequests: any = companyIcons.map((icon: CompanyIcon) => {
-      return axios.put(
-        `${ImageURL}${bucket}${subFolder}${icon.filename}`,
-        icon.image
-      );
+    const otherRequests: any = companyLogos?.map((icon: CompanyIcon) => {
+      return axios.put(`${imageBucket}${icon.filename}`, icon.image);
     });
 
     axios
@@ -164,38 +158,17 @@ function App() {
     const convertedFile: string = await convertToBase64(file);
     const base64 = convertedFile.split(";base64,")[1];
     setProfileImage(base64);
+    setProfile(base64);
   };
 
-  const onCompanyLogoUpdate = async ({
-    id,
-    logo,
-    event,
-  }: CompanyIconUpdateParams) => {
-    event.preventDefault();
-    const tempWorkExp = workExp.map((work) => {
-      if (work.id === id) {
-        work.src = logo.filename;
-      }
-      return work;
-    });
-    const imageArr = [...companyIcons, logo];
-    setCompanyIcons(imageArr);
-    setWorkExp(tempWorkExp);
-  };
-
-  const onRemoveWork = ({ id }: { id: string }) => {
-    const tempArray = workExp.filter((work) => work.id !== id);
-    setWorkExp(tempArray);
-  };
   const onAddWorkExp = (e: any) => {
     e.preventDefault();
     setButtonDisability(true);
-    const uniqueObj = { id: uuid(), ...workExpObj };
-    const tempArray = [uniqueObj, ...workExp];
-    setWorkExp(tempArray);
+    const id = uuid();
+    setWorkExp(workExp.set(id, { ...workExpObj, id }));
   };
   return (
-    <>
+    <FormContext.Provider value={value}>
       <Header></Header>
       <form className="mt-8 space-y-6 experience-form" noValidate>
         <div className="-space-y-px personal-details">
@@ -203,7 +176,7 @@ function App() {
             <Image
               forLabel="profile-image"
               onChange={onProfileImageChange}
-              src={profileImage}
+              src={profile}
             />
           </div>
           <div>
@@ -231,14 +204,8 @@ function App() {
           </button>
         </div>
         <div className="-space-y-px work-exp">
-          {workExp.map((work, i) => (
-            <Work
-              key={work.id}
-              workExp={work}
-              onWorkFormUpdate={onWorkFormUpdate}
-              onRemoveWork={onRemoveWork}
-              onCompanyLogoUpdate={onCompanyLogoUpdate}
-            />
+          {Array.from(workExp.values()).map((work, i) => (
+            <Work key={work.id} workExp={work} />
           ))}
         </div>
       </form>
@@ -253,7 +220,7 @@ function App() {
           Save
         </button>
       </Footer>
-    </>
+    </FormContext.Provider>
   );
 }
 
