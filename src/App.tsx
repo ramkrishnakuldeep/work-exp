@@ -209,9 +209,11 @@ function App() {
           </button>
         </div>
         <div className="-space-y-px work-exp">
-          {Array.from(workExp.values()).map((work, i) => (
-            <Work key={work.id} workExp={work} />
-          ))}
+          {Array.from(workExp.values())
+            .reverse()
+            .map((work, i) => (
+              <Work key={work.id} workExp={work} />
+            ))}
         </div>
       </form>
       <Footer>
