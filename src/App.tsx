@@ -24,8 +24,9 @@ import {
   subFolder,
   workExpObj,
   formObj,
-  logoObj,
 } from "./constants/constants";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { Map } from "immutable";
 
@@ -88,7 +89,6 @@ function App() {
         responseType: "blob",
       })
       .then(async (response: any) => {
-        // const baseImage: any = URL.createObjectURL(response.data);
         const reader: any = new FileReader();
         reader.readAsDataURL(response.data);
         reader.onloadend = function () {
@@ -135,15 +135,20 @@ function App() {
       requestTwo = axios.put(`${imageBucket}${form.src}`, profileImage);
     }
 
-    const otherRequests: any = companyLogos?.map((icon: CompanyIcon) => {
-      return axios.put(`${imageBucket}${icon.filename}`, icon.image);
-    });
+    const otherRequests: any = companyLogos
+      ? companyLogos.map((icon: CompanyIcon) => {
+          return axios.put(`${imageBucket}${icon.filename}`, icon.image);
+        })
+      : [];
 
     axios
       .all([requestOne, requestTwo, ...otherRequests])
       .then(
         axios.spread((...responses) => {
           console.log("response ", responses);
+          toast.success("Data successfully updated !", {
+            position: toast.POSITION.TOP_RIGHT,
+          });
         })
       )
       .catch((errors) => {
@@ -219,6 +224,7 @@ function App() {
         >
           Save
         </button>
+        <ToastContainer />
       </Footer>
     </FormContext.Provider>
   );

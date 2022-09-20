@@ -34,7 +34,7 @@ export const workExpObj = {
   startDate: "",
   endDate: "",
   company: "",
-  src: "",
+  src: "logo-placeholder.png",
   jobTitle: "",
   jobDescription: "",
 };
@@ -49,7 +49,7 @@ export const convertToBase64 = (file: any): Promise<any> => {
   });
 };
 export const ImageURL =
-  "https://lhlhawt55i.execute-api.us-west-2.amazonaws.com/v1/s3?key=";
+  "https://lhlhawt55i.execute-api.us-west-2.amazonaws.com/v2/s3?key=";
 export const DataURL =
   "https://d0hzzp14n7.execute-api.us-west-2.amazonaws.com/default/candidates-function";
 export const bucket = "years-of-experience-file-upload/";
